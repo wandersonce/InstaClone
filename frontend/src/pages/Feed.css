@@ -56,6 +56,10 @@ section#post-list article footer p{
     line-height: 18px;
 }
 
+section#post-list article footer strong {
+    display: block;
+}
+
 section#post-list article footer p span {
     color: #7159c1;
     display: block;

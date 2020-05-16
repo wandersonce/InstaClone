@@ -24,7 +24,7 @@ class Feed extends Component {
         return (
             <section id="post-list">
                 {this.state.feed.map(post => (
-                    <article>
+                    <article key={post._id}>
                         <header>
                             <div className="user-info">
                                 <span>{post.author}</span>
@@ -42,7 +42,7 @@ class Feed extends Component {
                                 <img src={comment} alt="" />
                                 <img src={send} alt="" />
 
-                                <strong>{post.likes}</strong>
+                                <strong>{post.likes} likes</strong>
 
                                 <p>
                                     {post.description}
