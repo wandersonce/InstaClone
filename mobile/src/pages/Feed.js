@@ -1,5 +1,7 @@
-import React, { Component } from 'react'
-import { Text, View, Image, TouchableOpacity } from 'react-native'
+import React, { Component } from 'react';
+import api from '../services/api';
+
+import { Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 
 import camera from '../assets/camera.png';
 
@@ -11,10 +13,28 @@ export default class Feed extends Component {
             </TouchableOpacity>
         ),
     });
+
+    state = {
+        feed: [],
+    };
+
+    async componentDidMount() {
+        //this.registerToSocket();
+
+        const response = await api.get('posts');
+
+        this.setState({ feed: response.data })
+    };
+
     render() {
         return (
             <View>
-                <Text> Feed </Text>
+                <FlatList
+                    data={this.state.feed}
+                    keyExtractor={post => post._id}
+                    renderItem={({ item }) => (
+                        <Text>{item.author}</Text>
+                    )} />
             </View>
         )
     }
