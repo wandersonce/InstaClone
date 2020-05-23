@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import api from '../services/api';
 import { Text, View, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
@@ -13,6 +14,7 @@ export default class New extends Component {
         description: '',
         hashtags: '',
         preview: null,
+        image: null,
     };
 
     handleSelectImage = () => {
@@ -28,10 +30,41 @@ export default class New extends Component {
                     uri: `data:image/jpeg;base64, ${upload.data}`,
                 }
 
-                this.setState({ preview })
+                let prefix;
+                let ext;
+
+                if (upload.fileName) {
+                    [prefix, ext] = upload.fileName.split('.') // * Everything that comes before '.' will be associated to prefix and after will be associated to ext(extension)
+                    ext = ext.toLowerCase() === 'heic' ? 'jpg' : ext;
+                } else {
+                    prefix = new Date().getTime(); //! For IOS photos, the filename sometimes does not come with the picture
+                    ext = 'jpg';
+                }
+
+                const image = {
+                    uri: upload.uri,
+                    type: upload.type,
+                    name: `${prefix}.${ext}`
+                };
+
+                this.setState({ preview, image })
             }
         })
     };
+
+    handleSubmit = async () => {
+        const data = new FormData();
+
+        data.append('image', this.state.image);
+        data.append('author', this.state.author);
+        data.append('place', this.state.place);
+        data.append('description', this.state.description);
+        data.append('hashtags', this.state.hashtags);
+
+        await api.post('posts', data);
+
+        this.props.navigation.navigate('Feed');
+    }
 
     render() {
         return (
@@ -59,7 +92,7 @@ export default class New extends Component {
                     placeholder="Place"
                     placeholderTextColor="#999"
                     value={this.state.place}
-                    onChangeText={author => this.setState({ place })}
+                    onChangeText={place => this.setState({ place })}
                 />
 
                 <TextInput
@@ -69,7 +102,7 @@ export default class New extends Component {
                     placeholder="Description"
                     placeholderTextColor="#999"
                     value={this.state.description}
-                    onChangeText={author => this.setState({ description })}
+                    onChangeText={description => this.setState({ description })}
                 />
 
                 <TextInput
@@ -79,10 +112,10 @@ export default class New extends Component {
                     placeholder="Hashtags"
                     placeholderTextColor="#999"
                     value={this.state.hashtags}
-                    onChangeText={author => this.setState({ hashtags })}
+                    onChangeText={hashtags => this.setState({ hashtags })}
                 />
 
-                <TouchableOpacity style={styles.shareButton} onPress={() => { }}>
+                <TouchableOpacity style={styles.shareButton} onPress={this.handleSubmit}>
                     <Text style={styles.shareButtonText}>Share post</Text>
                 </TouchableOpacity>
             </View>
