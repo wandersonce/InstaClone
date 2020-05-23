@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import ImagePicker from 'react-native-image-picker';
 
 export default class New extends Component {
     static navigationOptions = {
@@ -11,14 +12,35 @@ export default class New extends Component {
         place: '',
         description: '',
         hashtags: '',
+        preview: null,
+    };
+
+    handleSelectImage = () => {
+        ImagePicker.showImagePicker({
+            title: 'Select Image',
+        }, upload => {
+            if (upload.error) {
+                console.log('Error');
+            } else if (upload.didCancel) {
+                console.log('User Canceled')
+            } else {
+                const preview = {
+                    uri: `data:image/jpeg;base64, ${upload.data}`,
+                }
+
+                this.setState({ preview })
+            }
+        })
     };
 
     render() {
         return (
             <View styles={styles.container}>
-                <TouchableOpacity style={styles.selectButton} onPress={() => { }}>
+                <TouchableOpacity style={styles.selectButton} onPress={this.handleSelectImage}>
                     <Text style={styles.selectButtonText}>Select Image</Text>
                 </TouchableOpacity>
+
+                {this.state.preview && <Image style={styles.preview} source={this.state.preview} />}
 
                 <TextInput
                     style={styles.input}
